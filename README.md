@@ -1,1 +1,1 @@
-# rotating-backup.sh
+# rotating-tar-backup.sh
