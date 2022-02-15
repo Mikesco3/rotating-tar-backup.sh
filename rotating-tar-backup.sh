@@ -3,10 +3,11 @@
 ## last edit: 20220214
 
 ## Variables
-BACKUP_SRC_PATH=${1%/}
-BACKUP_SOURCE_PATH=${2%/}
+BACKUP_SOURCE_PATH=${1%/}
+BACKUP_DEST_PATH=${2%/}
 NUM_OF_RETAINED_BACKUPS=$3
-BACKUP_FILE_NAME=ROTATING-Backup-`hostname`-$4
+# BACKUP_FILE_NAME=RotatingTarBackup-`hostname`-$4
+BACKUP_FILE_NAME=RotatingBackup-cityofrobins.org-$4
 BACKUP_FILE_LIST=$BACKUP_FILE_NAME"_list.txt"
 RM_BACKUP_LIST=$BACKUP_FILE_NAME"_rm_list.txt"
 
@@ -81,6 +82,7 @@ echo '\n'
 
 ### Tests on First Argument  Source
 ## if not empty or contains just a number instead of a path
+echo "Test 1a"
 case $1 in
     ''|[0-9]*) echo "ERROR1" $ERROR1 ;;
     *) echo "backup Source path:" $1 ;;
@@ -88,23 +90,24 @@ esac
 
 echo '\n' 
 
-
-## check if backup path starts with slash
-# case "$BACKUP_SOURCE_PATH" in
-#   *\/*)
-#     echo "Good, contains a slash"
-#     ;;
-#   *)
-#     echo "Error: check your backup path" '\n'
-# 	echo "argument Provided:"
-#     ;;
-# esac
+## check if backup Source path starts with slash
+echo "Test 1b"
+case "$BACKUP_SOURCE_PATH" in
+  *\/*)
+    echo "Good, contains a slash"
+    ;;
+  *)
+    echo "Error: check your Source backup path" '\n'
+	echo "argument Provided:"
+    ;;
+esac
 echo $BACKUP_SOURCE_PATH 
 
 echo '\n' 
 
 ### Tests on Second Argument Destination
 ## if not empty or contains just a number instead of a path
+echo "Test 2a"
 case $2 in
     ''|[0-9]*) echo "ERROR2" $ERROR2 ;;
     *) echo "backup Destination path:" $2 ;;
@@ -113,12 +116,13 @@ esac
 echo '\n' 
 
 ## check if backup path starts with slash
+echo "Test 2b"
 case "$BACKUP_DEST_PATH" in
   *\/*)
     echo "Good, contains a slash"
     ;;
   *)
-    echo "Error: check your backup path" '\n'
+    echo "Error: check your Destination backup path" '\n'
 	echo "argument Provided:"
     ;;
 esac
@@ -126,6 +130,7 @@ echo $BACKUP_DEST_PATH
 
 ### Tests on Third Argument 
 ## check if NOT empty and if it is a number 
+echo "Test 3"
 case $3 in
     ''|*[!0-9]*) 
 		echo "	Error with third argument"
@@ -140,8 +145,8 @@ echo '\n'
 ### START
 if [ -d "$BACKUP_DEST_PATH" ]; then
 	## Take action if $BACKUP_DEST_PATH exists ##
-	echo "Backing up Proxmox to ${BACKUP_DEST_PATH}..."
-	cd /
+	echo "Backing up $BACKUP_SOURCE_PATH to $BACKUP_DEST_PATH..."
+	cd $BACKUP_SOURCE_PATH
 	pwd
 	echo tar "$BACKUP_DEST_PATH/$BACKUP_FILE_NAME""_root_""`date +"%Y-%m-%d-%H%M"`".tgz .
 
@@ -149,25 +154,9 @@ if [ -d "$BACKUP_DEST_PATH" ]; then
 	## any other location that should NOT be included in the tar file
 	## for example the Destination folder for the backups.
 	tar \
-	--exclude='./dev' \
-	--exclude='./sys' \
-	--exclude='./proc' \
-	--exclude='./mnt' \
-	--exclude='./tmp' \
-	--exclude='./run' \
-	--exclude='./var/log' \
-	--exclude='./var/spool' \
-	--exclude='./var/lib/samba/private' \
-	--exclude='./var/lib/lxcfs' \
-	--exclude='./var/lib/vz' \
-	--exclude='./lost+found' \
-	--exclude='./tank100' \
-	--exclude='./_Backup' \
-	--exclude=${BACKUP_DEST_PATH} \
-	--exclude='*/dump/*' \
-	--exclude='*/template/iso/*' \
-	--exclude='*/template/cache/*' \
-	-zcvf "$BACKUP_DEST_PATH/$BACKUP_FILE_NAME""_root_""`date +"%Y-%m-%d-%H%M"`".tgz .
+	 --exclude=$BACKUP_SOURCE_PATH \
+	 --exclude=$BACKUP_DEST_PATH \
+	 -zcvf "$BACKUP_DEST_PATH/$BACKUP_FILE_NAME""_root_""`date +"%Y-%m-%d-%H%M"`".tgz .
 	
 	echo '\n'
 	cd $BACKUP_DEST_PATH
