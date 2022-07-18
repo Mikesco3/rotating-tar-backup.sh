@@ -7,7 +7,7 @@ BACKUP_SOURCE_PATH=${1%/}
 BACKUP_DEST_PATH=${2%/}
 NUM_OF_RETAINED_BACKUPS=$3
 # BACKUP_FILE_NAME=RotatingTarBackup-`hostname`-$4
-BACKUP_FILE_NAME=RotatingBackup-cityofrobins.org-$4
+BACKUP_FILE_NAME=RotatingBackup-$4
 BACKUP_FILE_LIST=$BACKUP_FILE_NAME"_list.txt"
 RM_BACKUP_LIST=$BACKUP_FILE_NAME"_rm_list.txt"
 
